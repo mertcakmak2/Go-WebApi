@@ -17,6 +17,13 @@ func GetAllTodos(todo *[]model.Todo) (err error) {
 	return nil
 }
 
+func GetTodoById(todo *model.Todo, id string) (err error) {
+	if err = config.DB.Where("id = ?", id).First(todo).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
 func CreateTodo(todo *model.Todo) (err error) {
 	if err = config.DB.Create(todo).Error; err != nil {
 		fmt.Println("hata")
@@ -30,7 +37,7 @@ func UpdateTodo(id string) (err error) {
 	return nil
 }
 
-func DeleteTodo(id string) (err error) {
+func DeleteTodo(todo *model.Todo, id string) (err error) {
 	config.DB.Where("id = ?", id).Delete(&model.Todo{})
 	return nil
 }

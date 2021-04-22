@@ -26,10 +26,8 @@ func GetAllTodos(c echo.Context) error {
 func CreateTodo(c echo.Context) error {
 	todo := new(model.Todo)
 	if err := c.Bind(todo); err != nil {
-		fmt.Println("yedin bad requesti :)")
 		return c.JSON(http.StatusBadRequest, err)
 	}
-
 	err := repository.CreateTodo(todo)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -42,12 +40,26 @@ func CreateTodo(c echo.Context) error {
 
 func UpdateTodo(c echo.Context) error {
 	id := c.Param("id")
+	var todo model.Todo
+	foundErr := repository.GetTodoById(&todo, id)
+	// Todo bulunmaz ise 404 döndürülecek..
+	if foundErr != nil {
+		return c.JSON(http.StatusNotFound, foundErr.Error())
+	}
+
 	repository.UpdateTodo(id)
 	return c.String(http.StatusOK, "id= "+id+" todo successfully updated")
 }
 
 func DeleteTodo(c echo.Context) error {
 	id := c.Param("id")
-	err := repository.DeleteTodo(id)
-	return c.JSON(http.StatusOK, err)
+	var todo model.Todo
+	foundErr := repository.GetTodoById(&todo, id)
+	// Todo bulunmaz ise 404 döndürülecek..
+	if foundErr != nil {
+		return c.JSON(http.StatusNotFound, foundErr.Error())
+	}
+
+	repository.DeleteTodo(&todo, id)
+	return c.String(http.StatusOK, "id= "+id+" todo successfully deleted")
 }
